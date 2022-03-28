@@ -55,6 +55,17 @@ service TodoListService {
       summary: "Add a new Task into the list"
       description: "Add a new Task into the list"
       tags: "Task"
+      responses: {
+        key: "201"
+        value: {
+          description: "Task created successfully"
+          schema: {
+            json_schema: {
+              ref: ".todolist.CreateTaskResponse"
+            }
+          }
+        }
+      }
     };
   }
   rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskResponse) {
@@ -76,8 +87,8 @@ service TodoListService {
       body: "*"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: ""
-      description: ""
+      summary: "Update task status"
+      description: "Update task status"
       tags: "Task"
     };
   }
@@ -96,8 +107,8 @@ service TodoListService {
       get: "/api/v1/task/{id}/comment"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: ""
-      description: ""
+      summary: "Get comments from task"
+      description: "Get comments from task"
       tags: "Comment"
     };
   }
@@ -107,9 +118,20 @@ service TodoListService {
       body: "*"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: ""
-      description: ""
+      summary: "Get all comments from task"
+      description: "Get all com,ents from task"
       tags: "Comment"
+      responses: {
+        key: "201"
+        value: {
+          description: "Comment created successfully"
+          schema: {
+            json_schema: {
+              ref: ".todolist.CreateCommentResponse"
+            }
+          }
+        }
+      }
     };
   }
   rpc DeleteComment(DeleteCommentRequest) returns (google.protobuf.Empty) {
@@ -117,8 +139,8 @@ service TodoListService {
       delete: "/api/v1/task/{id}/comment/{comment_id}"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: ""
-      description: ""
+      summary: "Delete comment from task by task_id and comment_id"
+      description: "Delete comment from task by task_id and comment_id"
       tags: "Comment"
     };
   }
@@ -127,8 +149,8 @@ service TodoListService {
       get: "/api/v1/task/{id}/label"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: ""
-      description: ""
+      summary: "Get all labels from task"
+      description: "Get all labels from task"
       tags: "Label"
     };
   }
@@ -138,9 +160,20 @@ service TodoListService {
       body: "*"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: ""
-      description: ""
+      summary: "Create label"
+      description: "Create label"
       tags: "Label"
+      responses: {
+        key: "201"
+        value: {
+          description: "Label created successfully"
+          schema: {
+            json_schema: {
+              ref: ".todolist.CreateLabelResponse"
+            }
+          }
+        }
+      }
     };
   }
   rpc DeleteLabel(DeleteLabelRequest) returns (google.protobuf.Empty) {
@@ -148,8 +181,8 @@ service TodoListService {
       delete: "/api/v1/task/{id}/label/{label_id}"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: ""
-      description: ""
+      summary: "Delete label from task by task_id and label_id"
+      description: "Delete label from task by task_id and label_id"
       tags: "Label"
     };
   }

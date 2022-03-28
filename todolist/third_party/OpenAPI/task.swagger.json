@@ -62,6 +62,12 @@
               "$ref": "#/definitions/todolistCreateTaskResponse"
             }
           },
+          "201": {
+            "description": "Task created successfully",
+            "schema": {
+              "$ref": "#/definitions/todolistCreateTaskResponse"
+            }
+          },
           "default": {
             "description": "An unexpected error response.",
             "schema": {
@@ -197,8 +203,8 @@
     },
     "/api/v1/task/{id}/comment": {
       "get": {
-        "summary": "Toggle task status",
-        "description": "Toggle task status.",
+        "summary": "Get comments from task",
+        "description": "Get comments from task",
         "operationId": "TodoListService_GetComments",
         "responses": {
           "200": {
@@ -223,16 +229,22 @@
           }
         ],
         "tags": [
-          "Task"
+          "Comment"
         ]
       },
       "post": {
-        "summary": "Toggle task status",
-        "description": "Toggle task status.",
+        "summary": "Get all comments from task",
+        "description": "Get all com,ents from task",
         "operationId": "TodoListService_CreateComment",
         "responses": {
           "200": {
             "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/todolistCreateCommentResponse"
+            }
+          },
+          "201": {
+            "description": "Comment created successfully",
             "schema": {
               "$ref": "#/definitions/todolistCreateCommentResponse"
             }
@@ -266,14 +278,14 @@
           }
         ],
         "tags": [
-          "Task"
+          "Comment"
         ]
       }
     },
     "/api/v1/task/{id}/comment/{comment_id}": {
       "delete": {
-        "summary": "Toggle task status",
-        "description": "Toggle task status.",
+        "summary": "Delete comment from task by task_id and comment_id",
+        "description": "Delete comment from task by task_id and comment_id",
         "operationId": "TodoListService_DeleteComment",
         "responses": {
           "200": {
@@ -304,14 +316,14 @@
           }
         ],
         "tags": [
-          "Task"
+          "Comment"
         ]
       }
     },
     "/api/v1/task/{id}/label": {
       "get": {
-        "summary": "Toggle task status",
-        "description": "Toggle task status.",
+        "summary": "Get all labels from task",
+        "description": "Get all labels from task",
         "operationId": "TodoListService_GetLabels",
         "responses": {
           "200": {
@@ -336,16 +348,22 @@
           }
         ],
         "tags": [
-          "Task"
+          "Label"
         ]
       },
       "post": {
-        "summary": "Toggle task status",
-        "description": "Toggle task status.",
+        "summary": "Create label",
+        "description": "Create label",
         "operationId": "TodoListService_CreateLabel",
         "responses": {
           "200": {
             "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/todolistCreateLabelResponse"
+            }
+          },
+          "201": {
+            "description": "Label created successfully",
             "schema": {
               "$ref": "#/definitions/todolistCreateLabelResponse"
             }
@@ -379,14 +397,14 @@
           }
         ],
         "tags": [
-          "Task"
+          "Label"
         ]
       }
     },
     "/api/v1/task/{id}/label/{label_id}": {
       "delete": {
-        "summary": "Toggle task status",
-        "description": "Toggle task status.",
+        "summary": "Delete label from task by task_id and label_id",
+        "description": "Delete label from task by task_id and label_id",
         "operationId": "TodoListService_DeleteLabel",
         "responses": {
           "200": {
@@ -417,14 +435,14 @@
           }
         ],
         "tags": [
-          "Task"
+          "Label"
         ]
       }
     },
     "/api/v1/task/{id}/status": {
       "patch": {
-        "summary": "Toggle task status",
-        "description": "Toggle task status.",
+        "summary": "Update task status",
+        "description": "Update task status",
         "operationId": "TodoListService_UpdateTaskStatus",
         "responses": {
           "200": {
