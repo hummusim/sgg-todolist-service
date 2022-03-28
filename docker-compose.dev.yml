@@ -1,0 +1,59 @@
+version: '3.5'
+
+services:
+  todolist-db:
+    image: postgres:14.2
+    volumes:
+      - ./todolist/scripts/db/10-init.sql:/docker-entrypoint-initdb.d/10-init.sql
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+    networks:
+      - todolist-net
+
+  todolist-grpc:
+    volumes:
+      - ./todolist:/go/src/github.com/overridesh/sgg-todolist-service
+      - "$CERTS_DIR/grpc:/etc/certs"
+    environment:
+      DATABASE_USERNAME: dbuser
+      DATABASE_PASSWORD: 12345
+      DATABASE_NAME: todolistdb
+      DATABASE_HOSTNAME: todolist-db
+      DATABASE_PORT: 5432
+      CERT_FILE: /etc/certs/cert.crt
+      KEY_FILE: /etc/certs/private.key
+    depends_on:
+      - todolist-db
+    build:
+      context: ./todolist
+      dockerfile: Dockerfile.grpc.dev
+    entrypoint: sh -c 'sleep 15 && goose -dir /go/src/github.com/overridesh/sgg-todolist-service/scripts/db/migrations postgres "host=todolist-db user=dbuser dbname=todolistdb port=5432 sslmode=disable" up && watcher -watch github.com/overridesh/sgg-todolist-service'
+    networks:
+      - todolist-net
+
+  todolist-http:
+    volumes:
+      - ./todolist:/go/src/github.com/overridesh/sgg-todolist-service
+      - "$CERTS_DIR/http:/etc/certs"
+      - "$CERTS_DIR/grpc/cert.crt:/etc/certs/grpc.crt"
+    environment:
+      TODOLIST_GRPC_HOST: dns:///todolist-grpc:10000
+      TODOLIST_GRPC_CERT: /etc/certs/grpc.crt
+      CERT_FILE: /etc/certs/cert.crt
+      KEY_FILE: /etc/certs/private.key
+      PORT: 11000
+    depends_on:
+      - todolist-grpc
+    build:
+      context: ./todolist
+      dockerfile: Dockerfile.http.dev
+    ports:
+      - "11000:11000"
+    networks:
+      - todolist-net
+
+networks:
+  todolist-net:
+

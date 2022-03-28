@@ -1,0 +1,85 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Healthcheck service",
+    "description": "Healthcheck service description",
+    "version": "1.0"
+  },
+  "tags": [
+    {
+      "name": "HealthcheckService"
+    }
+  ],
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/healthcheck": {
+      "get": {
+        "summary": "Healthcheckcheck endpoint",
+        "description": "The health check endpoint enables the health of a service instance to be periodically tested",
+        "operationId": "HealthcheckService_GetHealthcheck",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetHealthcheckResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "Healthcheckcheck"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1GetHealthcheckResponse": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

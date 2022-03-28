@@ -1,0 +1,2 @@
+CREATE USER dbuser WITH PASSWORD '12345';
+CREATE DATABASE todolistdb OWNER dbuser;

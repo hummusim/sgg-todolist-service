@@ -1,0 +1,273 @@
+syntax="proto3";
+
+package todolist;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/empty.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+// Defines the import path that should be used to import the generated package,
+// and the package name.
+option go_package = "github.com/overridesh/sgg-todolist-service/proto;todolist";
+
+// These annotations are used when generating the OpenAPI file.
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    version: "1.0";
+  };
+  external_docs: {
+    url: "https://github.com/overridesh/todolist";
+    description: "Todo List Service";
+  }
+  schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+};
+
+service TodoListService {
+  rpc GetTask(GetTaskRequest) returns (GetTaskResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/task/{id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get Tasks from a list"
+      description: "Get Tasks from a list"
+      tags: "Task"
+    };
+  }
+  rpc GetTasks(GetTasksRequest) returns (GetTasksResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/task"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get Tasks from a list"
+      description: "Get Tasks from a list"
+      tags: "Task"
+    };
+  }
+  rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/task"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Add a new Task into the list"
+      description: "Add a new Task into the list"
+      tags: "Task"
+    };
+  }
+  rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/task/{id}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Update Task with all values"
+      description: "Update Task with all values."
+      tags: "Task"
+    };
+  }
+  rpc UpdateTaskStatus(
+    UpdateTaskStatusRequest
+  ) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      patch: "/api/v1/task/{id}/status"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: ""
+      description: ""
+      tags: "Task"
+    };
+  }
+  rpc DeleteTask(DeleteTaskRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/task/{id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Delete Task by id"
+      description: "Delete Task by id."
+      tags: "Task"
+    };
+  }
+  rpc GetComments(GetCommentsRequest) returns (GetCommentsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/task/{id}/comment"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: ""
+      description: ""
+      tags: "Comment"
+    };
+  }
+  rpc CreateComment(CreateCommentRequest) returns (CreateCommentResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/task/{id}/comment"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: ""
+      description: ""
+      tags: "Comment"
+    };
+  }
+  rpc DeleteComment(DeleteCommentRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/task/{id}/comment/{comment_id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: ""
+      description: ""
+      tags: "Comment"
+    };
+  }
+  rpc GetLabels(GetLabelsRequest) returns (GetLabelsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/task/{id}/label"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: ""
+      description: ""
+      tags: "Label"
+    };
+  }
+  rpc CreateLabel(CreateLabelRequest) returns (CreateLabelResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/task/{id}/label"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: ""
+      description: ""
+      tags: "Label"
+    };
+  }
+  rpc DeleteLabel(DeleteLabelRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/task/{id}/label/{label_id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: ""
+      description: ""
+      tags: "Label"
+    };
+  }
+}
+
+message GetTaskRequest {
+  string id = 1;
+}
+
+message GetTaskResponse {
+  string id = 1;
+  string value = 2;
+  bool completed = 3;
+  string due_date = 4;
+  string created_at = 5;
+  string updated_at = 6;
+  repeated Comment comments = 7;
+  repeated Label labels = 8;
+}
+
+message GetTasksRequest {
+  int32 page = 1;
+}
+
+message GetTasksResponse {
+  repeated Task tasks = 1;
+}
+
+message CreateTaskRequest {
+  string value = 1;
+  string due_date = 2;
+}
+
+message CreateTaskResponse {
+  Task task = 1;
+}
+
+message UpdateTaskRequest {
+  string id = 1;
+  string value = 2;
+  bool completed = 3;
+  string due_date = 4;
+}
+
+message UpdateTaskResponse {
+  Task task = 1;
+}
+
+message DeleteTaskRequest {
+  string id = 1;
+}
+
+message UpdateTaskStatusRequest {
+  string id = 1;
+  bool completed = 2;
+}
+
+message Task {
+  string id = 1;
+  string value = 2;
+  bool completed = 3;
+  string due_date = 4;
+  string created_at = 5;
+  string updated_at = 6;
+}
+
+message Comment {
+  string id = 1;
+  string message = 2;
+  string created_at = 3;
+}
+
+message Label {
+  string id = 1;
+  string name = 2;
+  string created_at = 3;
+}
+
+message GetCommentsRequest {
+  string id = 1;
+}
+
+message GetCommentsResponse {
+  repeated Comment comments = 2;
+}
+
+message CreateCommentRequest {
+  string id = 1;
+  string comment = 2;
+}
+
+message CreateCommentResponse {
+  Comment comment = 1;
+}
+
+message DeleteCommentRequest {
+  string id = 1;
+  string comment_id = 2;
+}
+
+message GetLabelsRequest {
+  string id = 1;
+}
+
+message GetLabelsResponse {
+  repeated Label labels = 2;
+}
+
+message CreateLabelRequest {
+  string id = 1;
+  string label = 2;
+}
+
+message CreateLabelResponse {
+  Label label = 1;
+}
+
+message DeleteLabelRequest {
+  string id = 1;
+  string label_id = 2;
+}

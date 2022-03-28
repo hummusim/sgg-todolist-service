@@ -1,0 +1,37 @@
+syntax="proto3";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/empty.proto";
+
+package healthcheck.v1;
+// Defines the import path that should be used to import the generated package,
+// and the package name.
+option go_package = "github.com/overridesh/sgg-todolist-service/proto;todolist";
+
+// These annotations are used when generating the OpenAPI file.
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    version: "1.0";
+    title: "Healthcheck service";
+    description: "Healthcheck service description";
+  };
+  schemes: HTTPS;
+};
+
+service HealthcheckService {
+  rpc GetHealthcheck(google.protobuf.Empty) returns (GetHealthcheckResponse) {
+    option (google.api.http) = {
+      get: "/api/healthcheck"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Healthcheckcheck endpoint"
+      description: "The health check endpoint enables the health of a service instance to be periodically tested"
+      tags: "Healthcheckcheck"
+    };
+  }
+} 
+
+message GetHealthcheckResponse {
+  bool ok = 1;
+}

@@ -1,0 +1,1361 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>healthcheck: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/overridesh/sgg-todolist-service/internal/grpc/healthcheck/handler.go (100.0%)</option>
+				
+				<option value="file1">github.com/overridesh/sgg-todolist-service/internal/grpc/todolist/handler_comment.go (92.0%)</option>
+				
+				<option value="file2">github.com/overridesh/sgg-todolist-service/internal/grpc/todolist/handler_label.go (92.3%)</option>
+				
+				<option value="file3">github.com/overridesh/sgg-todolist-service/internal/grpc/todolist/handler_task.go (82.7%)</option>
+				
+				<option value="file4">github.com/overridesh/sgg-todolist-service/internal/repository/comment_repository.go (83.0%)</option>
+				
+				<option value="file5">github.com/overridesh/sgg-todolist-service/internal/repository/common.go (75.0%)</option>
+				
+				<option value="file6">github.com/overridesh/sgg-todolist-service/internal/repository/label_repository.go (80.4%)</option>
+				
+				<option value="file7">github.com/overridesh/sgg-todolist-service/internal/repository/task_repository.go (79.7%)</option>
+				
+				<option value="file8">github.com/overridesh/sgg-todolist-service/tools/config.go (100.0%)</option>
+				
+				<option value="file9">github.com/overridesh/sgg-todolist-service/tools/status_code.go (100.0%)</option>
+				
+				<option value="file10">github.com/overridesh/sgg-todolist-service/tools/time.go (100.0%)</option>
+				
+				<option value="file11">github.com/overridesh/sgg-todolist-service/tools/uuid.go (100.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package healthcheck
+
+import (
+        "context"
+
+        "google.golang.org/protobuf/types/known/emptypb"
+
+        pbPaymentGateway "github.com/overridesh/sgg-todolist-service/proto"
+)
+
+// Backend implements the protobuf interface
+type healthcheck struct{}
+
+// New initializes a new Healthcheck struct.
+func NewGRPC() pbPaymentGateway.HealthcheckServiceServer <span class="cov8" title="1">{
+        return &amp;healthcheck{}
+}</span>
+
+// Healthcheck
+func (b *healthcheck) GetHealthcheck(ctx context.Context, _ *emptypb.Empty) (*pbPaymentGateway.GetHealthcheckResponse, error) <span class="cov8" title="1">{
+        return &amp;pbPaymentGateway.GetHealthcheckResponse{
+                Ok: true,
+        }, nil
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package todolist
+
+import (
+        "context"
+        "net/http"
+
+        "go.uber.org/zap"
+        "google.golang.org/protobuf/types/known/emptypb"
+
+        "github.com/overridesh/sgg-todolist-service/internal/model"
+        "github.com/overridesh/sgg-todolist-service/internal/repository"
+        pbTodoList "github.com/overridesh/sgg-todolist-service/proto"
+        "github.com/overridesh/sgg-todolist-service/tools"
+)
+
+func (svc *todoListGRPC) GetComments(ctx context.Context, in *pbTodoList.GetCommentsRequest) (*pbTodoList.GetCommentsResponse, error) <span class="cov8" title="1">{
+        taskId, err := tools.GetValidUUID(in.GetId())
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">task, err := svc.taskRepository.GetTask(ctx, taskId)
+        if err != nil </span><span class="cov8" title="1">{
+                if err == repository.ErrTaskNotFound </span><span class="cov8" title="1">{
+                        return nil, ErrStatusTaskNotFound.Err()
+                }</span>
+                <span class="cov8" title="1">zap.S().Errorf("cannot get task", zap.Error(err))
+                return nil, ErrStatusInternalServerError.Err()</span>
+        }
+
+        <span class="cov8" title="1">response := pbTodoList.GetCommentsResponse{}
+
+        comments, err := svc.commentRepository.GetCommentsByTaskId(ctx, task.Id)
+        if err != nil </span><span class="cov8" title="1">{
+                zap.S().Errorf("cannot get task", zap.Error(err))
+                return nil, ErrStatusInternalServerError.Err()
+        }</span>
+
+        <span class="cov8" title="1">for _, comment := range comments </span><span class="cov8" title="1">{
+                response.Comments = append(response.Comments, &amp;pbTodoList.Comment{
+                        Id:        comment.Id.String(),
+                        Message:   comment.Value,
+                        CreatedAt: tools.FormatDate(comment.CreatedAt),
+                })
+        }</span>
+
+        <span class="cov8" title="1">return &amp;response, nil</span>
+}
+
+func (svc *todoListGRPC) CreateComment(ctx context.Context, in *pbTodoList.CreateCommentRequest) (*pbTodoList.CreateCommentResponse, error) <span class="cov8" title="1">{
+        taskId, err := tools.GetValidUUID(in.GetId())
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">task, err := svc.taskRepository.GetTask(ctx, taskId)
+        if err != nil </span><span class="cov8" title="1">{
+                if err == repository.ErrTaskNotFound </span><span class="cov8" title="1">{
+                        return nil, ErrStatusTaskNotFound.Err()
+                }</span>
+                <span class="cov8" title="1">zap.S().Errorf("cannot get task", zap.Error(err))
+                return nil, ErrStatusInternalServerError.Err()</span>
+        }
+
+        <span class="cov8" title="1">comment, err := svc.commentRepository.CreateComment(ctx, model.Comment{
+                TaskId: task.Id,
+                Value:  in.GetComment(),
+        })
+        if err != nil </span><span class="cov8" title="1">{
+                zap.S().Errorf("cannot create comment", zap.Error(err))
+                return nil, ErrStatusInternalServerError.Err()
+        }</span>
+        <span class="cov8" title="1">response := pbTodoList.CreateCommentResponse{
+                Comment: &amp;pbTodoList.Comment{
+                        Id:        comment.Id.String(),
+                        Message:   comment.Value,
+                        CreatedAt: tools.FormatDate(comment.CreatedAt),
+                },
+        }
+
+        if err := tools.SetStatusCode(ctx, http.StatusCreated); err != nil </span><span class="cov0" title="0">{
+                zap.S().Errorf("cannot set new status_code", zap.Error(err))
+                return nil, ErrStatusInternalServerError.Err()
+        }</span>
+
+        <span class="cov8" title="1">return &amp;response, nil</span>
+}
+
+func (svc *todoListGRPC) DeleteComment(ctx context.Context, in *pbTodoList.DeleteCommentRequest) (*emptypb.Empty, error) <span class="cov8" title="1">{
+        taskId, err := tools.GetValidUUID(in.GetId())
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">commentId, err := tools.GetValidUUID(in.GetCommentId())
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">if err := svc.commentRepository.DeleteCommentByTaskIdAndCommentId(ctx, taskId, commentId); err != nil </span><span class="cov8" title="1">{
+                if err == repository.ErrCommentNotFound </span><span class="cov8" title="1">{
+                        return nil, ErrStatusCommentNotFound.Err()
+                }</span>
+                <span class="cov8" title="1">zap.S().Errorf("cannot delete comment", zap.Error(err))
+                return nil, ErrStatusInternalServerError.Err()</span>
+        }
+
+        <span class="cov8" title="1">if err := tools.SetStatusCode(ctx, http.StatusNoContent); err != nil </span><span class="cov0" title="0">{
+                zap.S().Errorf("cannot set new status_code", zap.Error(err))
+                return nil, ErrStatusInternalServerError.Err()
+        }</span>
+
+        <span class="cov8" title="1">return &amp;emptypb.Empty{}, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package todolist
+
+import (
+        "context"
+        "net/http"
+        "strings"
+
+        "go.uber.org/zap"
+        "google.golang.org/protobuf/types/known/emptypb"
+
+        "github.com/overridesh/sgg-todolist-service/internal/model"
+        "github.com/overridesh/sgg-todolist-service/internal/repository"
+        pbTodoList "github.com/overridesh/sgg-todolist-service/proto"
+        "github.com/overridesh/sgg-todolist-service/tools"
+)
+
+func (svc *todoListGRPC) GetLabels(ctx context.Context, in *pbTodoList.GetLabelsRequest) (*pbTodoList.GetLabelsResponse, error) <span class="cov8" title="1">{
+        taskId, err := tools.GetValidUUID(in.GetId())
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">task, err := svc.taskRepository.GetTask(ctx, taskId)
+        if err != nil </span><span class="cov8" title="1">{
+                if err == repository.ErrTaskNotFound </span><span class="cov8" title="1">{
+                        return nil, ErrStatusTaskNotFound.Err()
+                }</span>
+                <span class="cov8" title="1">zap.S().Errorf("cannot get task", zap.Error(err))
+                return nil, ErrStatusInternalServerError.Err()</span>
+        }
+
+        <span class="cov8" title="1">response := pbTodoList.GetLabelsResponse{}
+
+        labels, err := svc.labelRepository.GetLabelsByTaskId(ctx, task.Id)
+        if err != nil </span><span class="cov8" title="1">{
+                zap.S().Errorf("cannot get labels", zap.Error(err))
+                return nil, ErrStatusInternalServerError.Err()
+        }</span>
+
+        <span class="cov8" title="1">for _, label := range labels </span><span class="cov8" title="1">{
+                response.Labels = append(response.Labels, &amp;pbTodoList.Label{
+                        Id:        label.Id.String(),
+                        Name:      label.Value,
+                        CreatedAt: tools.FormatDate(label.CreatedAt),
+                })
+        }</span>
+
+        <span class="cov8" title="1">return &amp;response, nil</span>
+}
+
+func (svc *todoListGRPC) CreateLabel(ctx context.Context, in *pbTodoList.CreateLabelRequest) (*pbTodoList.CreateLabelResponse, error) <span class="cov8" title="1">{
+        taskId, err := tools.GetValidUUID(in.GetId())
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">task, err := svc.taskRepository.GetTask(ctx, taskId)
+        if err != nil </span><span class="cov8" title="1">{
+                if err == repository.ErrTaskNotFound </span><span class="cov8" title="1">{
+                        return nil, ErrStatusTaskNotFound.Err()
+                }</span>
+                <span class="cov8" title="1">zap.S().Errorf("cannot get task", zap.Error(err))
+                return nil, ErrStatusInternalServerError.Err()</span>
+        }
+
+        <span class="cov8" title="1">label, err := svc.labelRepository.CreateLabel(ctx, model.Label{
+                TaskId: task.Id,
+                Value:  strings.ToLower(in.GetLabel()),
+        })
+        if err != nil </span><span class="cov8" title="1">{
+                if err == repository.ErrLabelAlreadyExists </span><span class="cov8" title="1">{
+                        return nil, ErrStatusLabelAlreadyExists.Err()
+                }</span>
+                <span class="cov8" title="1">zap.S().Errorf("cannot create label", zap.Error(err))
+                return nil, ErrStatusInternalServerError.Err()</span>
+        }
+
+        <span class="cov8" title="1">response := pbTodoList.CreateLabelResponse{
+                Label: &amp;pbTodoList.Label{
+                        Id:        label.Id.String(),
+                        Name:      label.Value,
+                        CreatedAt: tools.FormatDate(label.CreatedAt),
+                },
+        }
+
+        if err := tools.SetStatusCode(ctx, http.StatusCreated); err != nil </span><span class="cov0" title="0">{
+                zap.S().Errorf("cannot set new status_code", zap.Error(err))
+                return nil, ErrStatusInternalServerError.Err()
+        }</span>
+        <span class="cov8" title="1">return &amp;response, nil</span>
+}
+
+func (svc *todoListGRPC) DeleteLabel(ctx context.Context, in *pbTodoList.DeleteLabelRequest) (*emptypb.Empty, error) <span class="cov8" title="1">{
+        taskId, err := tools.GetValidUUID(in.GetId())
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">labelId, err := tools.GetValidUUID(in.GetLabelId())
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">if err := svc.labelRepository.DeleteLabelByTaskIdAndLabelId(ctx, taskId, labelId); err != nil </span><span class="cov8" title="1">{
+                if err == repository.ErrLabelNotFound </span><span class="cov8" title="1">{
+                        return nil, ErrStatusErrLabelNotFound.Err()
+                }</span>
+                <span class="cov8" title="1">zap.S().Errorf("cannot delete comment", zap.Error(err))
+                return nil, ErrStatusInternalServerError.Err()</span>
+        }
+
+        <span class="cov8" title="1">if err := tools.SetStatusCode(ctx, http.StatusNoContent); err != nil </span><span class="cov0" title="0">{
+                zap.S().Errorf("cannot set new status_code", zap.Error(err))
+                return nil, ErrStatusInternalServerError.Err()
+        }</span>
+
+        <span class="cov8" title="1">return &amp;emptypb.Empty{}, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package todolist
+
+import (
+        "context"
+        "database/sql"
+        "net/http"
+        "strings"
+        "time"
+
+        "go.uber.org/zap"
+        "google.golang.org/protobuf/types/known/emptypb"
+
+        "github.com/overridesh/sgg-todolist-service/internal/model"
+        "github.com/overridesh/sgg-todolist-service/internal/repository"
+        pbTodoList "github.com/overridesh/sgg-todolist-service/proto"
+        "github.com/overridesh/sgg-todolist-service/tools"
+)
+
+// NewTodoListGRPC implements the protobuf interface
+type todoListGRPC struct {
+        taskRepository    repository.TaskRepository
+        commentRepository repository.CommentRepository
+        labelRepository   repository.LabelRepository
+}
+
+// New initializes a new NewTodoListGRPC struct.
+func NewGRPC(taskRepository repository.TaskRepository, commentRepository repository.CommentRepository, labelRepository repository.LabelRepository) pbTodoList.TodoListServiceServer <span class="cov8" title="1">{
+        return &amp;todoListGRPC{
+                taskRepository:    taskRepository,
+                commentRepository: commentRepository,
+                labelRepository:   labelRepository,
+        }
+}</span>
+
+func (svc *todoListGRPC) GetTask(ctx context.Context, in *pbTodoList.GetTaskRequest) (*pbTodoList.GetTaskResponse, error) <span class="cov8" title="1">{
+        taskId, err := tools.GetValidUUID(in.GetId())
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">task, err := svc.taskRepository.GetTask(ctx, taskId)
+        if err != nil </span><span class="cov8" title="1">{
+                if err == repository.ErrTaskNotFound </span><span class="cov8" title="1">{
+                        return nil, ErrStatusTaskNotFound.Err()
+                }</span>
+                <span class="cov8" title="1">zap.S().Errorf("cannot get task", zap.Error(err))
+                return nil, ErrStatusInternalServerError.Err()</span>
+        }
+
+        <span class="cov8" title="1">response := pbTodoList.GetTaskResponse{
+                Id:        task.Id.String(),
+                Value:     task.Value,
+                Completed: task.Completed,
+                CreatedAt: tools.FormatDate(task.CreatedAt),
+                UpdatedAt: tools.FormatDate(task.UpdatedAt),
+        }
+
+        if task.DueDate.Valid </span><span class="cov0" title="0">{
+                response.DueDate = tools.FormatDate(task.DueDate.Time)
+        }</span>
+
+        <span class="cov8" title="1">comments, err := svc.commentRepository.GetCommentsByTaskId(ctx, taskId)
+        if err != nil &amp;&amp; err != repository.ErrCommentNotFound </span><span class="cov8" title="1">{
+                zap.S().Errorf("cannot get task", zap.Error(err))
+                return nil, ErrStatusInternalServerError.Err()
+        }</span>
+
+        <span class="cov8" title="1">for _, comment := range comments </span><span class="cov0" title="0">{
+                response.Comments = append(response.Comments, &amp;pbTodoList.Comment{
+                        Id:        comment.Id.String(),
+                        Message:   comment.Value,
+                        CreatedAt: tools.FormatDate(comment.CreatedAt),
+                })
+        }</span>
+
+        <span class="cov8" title="1">labels, err := svc.labelRepository.GetLabelsByTaskId(ctx, taskId)
+        if err != nil &amp;&amp; err != repository.ErrLabelNotFound </span><span class="cov8" title="1">{
+                zap.S().Errorf("cannot get task", zap.Error(err))
+                return nil, ErrStatusInternalServerError.Err()
+        }</span>
+
+        <span class="cov8" title="1">for _, label := range labels </span><span class="cov0" title="0">{
+                response.Labels = append(response.Labels, &amp;pbTodoList.Label{
+                        Id:        label.Id.String(),
+                        Name:      label.Value,
+                        CreatedAt: tools.FormatDate(label.CreatedAt),
+                })
+        }</span>
+
+        <span class="cov8" title="1">return &amp;response, nil</span>
+}
+
+func (svc *todoListGRPC) GetTasks(ctx context.Context, in *pbTodoList.GetTasksRequest) (*pbTodoList.GetTasksResponse, error) <span class="cov8" title="1">{
+        var page int32 = in.GetPage()
+
+        tasks, err := svc.taskRepository.GetTasks(ctx, page)
+        if err != nil </span><span class="cov8" title="1">{
+                zap.S().Errorf("cannot get tasks", zap.Error(err))
+                return nil, ErrStatusInternalServerError.Err()
+        }</span>
+
+        <span class="cov8" title="1">response := pbTodoList.GetTasksResponse{}
+        for _, task := range tasks </span><span class="cov8" title="1">{
+                taskList := pbTodoList.Task{
+                        Id:        task.Id.String(),
+                        Value:     task.Value,
+                        Completed: task.Completed,
+                        CreatedAt: tools.FormatDate(task.CreatedAt),
+                        UpdatedAt: tools.FormatDate(task.UpdatedAt),
+                }
+
+                if task.DueDate.Valid </span><span class="cov0" title="0">{
+                        taskList.DueDate = tools.FormatDate(task.DueDate.Time)
+                }</span>
+
+                <span class="cov8" title="1">response.Tasks = append(response.Tasks, &amp;taskList)</span>
+        }
+
+        <span class="cov8" title="1">return &amp;response, nil</span>
+}
+
+func (svc *todoListGRPC) CreateTask(ctx context.Context, in *pbTodoList.CreateTaskRequest) (*pbTodoList.CreateTaskResponse, error) <span class="cov8" title="1">{
+        var dueDate sql.NullTime
+
+        if len(strings.TrimSpace(in.GetDueDate())) &gt; 0 </span><span class="cov8" title="1">{
+                dueDateTime, err := time.Parse(tools.TimeLayout, in.GetDueDate())
+                if err != nil </span><span class="cov8" title="1">{
+                        zap.S().Errorf("cannot parse timelayout", zap.Error(err))
+                        return nil, ErrStatusCannotParseTimeLayout.Err()
+                }</span>
+                <span class="cov0" title="0">dueDate.Time = dueDateTime
+                dueDate.Valid = true</span>
+        }
+
+        <span class="cov8" title="1">task, err := svc.taskRepository.CreateTask(ctx, model.Task{
+                Value:   in.GetValue(),
+                DueDate: dueDate,
+        })
+        if err != nil </span><span class="cov8" title="1">{
+                zap.S().Errorf("cannot create task", zap.Error(err))
+                return nil, ErrStatusInternalServerError.Err()
+        }</span>
+        <span class="cov8" title="1">response := pbTodoList.CreateTaskResponse{
+                Task: &amp;pbTodoList.Task{
+                        Id:        task.Id.String(),
+                        Value:     task.Value,
+                        Completed: task.Completed,
+                        CreatedAt: tools.FormatDate(task.CreatedAt),
+                        UpdatedAt: tools.FormatDate(task.UpdatedAt),
+                },
+        }
+
+        if task.DueDate.Valid </span><span class="cov0" title="0">{
+                response.Task.DueDate = tools.FormatDate(task.DueDate.Time)
+        }</span>
+
+        <span class="cov8" title="1">if err := tools.SetStatusCode(ctx, http.StatusCreated); err != nil </span><span class="cov0" title="0">{
+                zap.S().Errorf("cannot set new status_code", zap.Error(err))
+                return nil, ErrStatusInternalServerError.Err()
+        }</span>
+
+        <span class="cov8" title="1">return &amp;response, nil</span>
+}
+
+func (svc *todoListGRPC) UpdateTask(ctx context.Context, in *pbTodoList.UpdateTaskRequest) (*pbTodoList.UpdateTaskResponse, error) <span class="cov8" title="1">{
+        taskId, err := tools.GetValidUUID(in.GetId())
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">task, err := svc.taskRepository.GetTask(ctx, taskId)
+        if err != nil </span><span class="cov8" title="1">{
+                if err == repository.ErrTaskNotFound </span><span class="cov8" title="1">{
+                        return nil, ErrStatusTaskNotFound.Err()
+                }</span>
+                <span class="cov8" title="1">zap.S().Errorf("cannot update task", zap.Error(err))
+                return nil, ErrStatusInternalServerError.Err()</span>
+        }
+
+        <span class="cov8" title="1">task.Completed = in.Completed
+        task.Value = in.Value
+
+        if task.DueDate.Valid </span><span class="cov0" title="0">{
+                dueDateTime, err := time.Parse(tools.TimeLayout, in.GetDueDate())
+                if err != nil </span><span class="cov0" title="0">{
+                        zap.S().Errorf("cannot parse timelayout", zap.Error(err))
+                        return nil, ErrStatusCannotParseTimeLayout.Err()
+                }</span>
+                <span class="cov0" title="0">task.DueDate.Time = dueDateTime</span>
+        }
+
+        <span class="cov8" title="1">if err := svc.taskRepository.UpdateTask(ctx, task); err != nil </span><span class="cov8" title="1">{
+                zap.S().Errorf("cannot update task", zap.Error(err))
+                return nil, ErrStatusInternalServerError.Err()
+        }</span>
+
+        <span class="cov8" title="1">response := pbTodoList.UpdateTaskResponse{
+                Task: &amp;pbTodoList.Task{
+                        Id:        task.Id.String(),
+                        Value:     task.Value,
+                        Completed: task.Completed,
+                        CreatedAt: tools.FormatDate(task.CreatedAt),
+                        UpdatedAt: tools.FormatDate(task.UpdatedAt),
+                },
+        }
+
+        if task.DueDate.Valid </span><span class="cov0" title="0">{
+                response.Task.DueDate = tools.FormatDate(task.DueDate.Time)
+        }</span>
+
+        <span class="cov8" title="1">return &amp;response, nil</span>
+}
+
+func (svc *todoListGRPC) DeleteTask(ctx context.Context, in *pbTodoList.DeleteTaskRequest) (*emptypb.Empty, error) <span class="cov8" title="1">{
+        taskId, err := tools.GetValidUUID(in.GetId())
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">if err := svc.taskRepository.DeleteTask(ctx, taskId); err != nil </span><span class="cov8" title="1">{
+                if err == repository.ErrTaskNotFound </span><span class="cov8" title="1">{
+                        return nil, ErrStatusTaskNotFound.Err()
+                }</span>
+                <span class="cov8" title="1">zap.S().Errorf("cannot delete task", zap.Error(err))
+                return nil, ErrStatusInternalServerError.Err()</span>
+        }
+
+        <span class="cov8" title="1">if err := tools.SetStatusCode(ctx, http.StatusNoContent); err != nil </span><span class="cov0" title="0">{
+                zap.S().Errorf("cannot set new status_code", zap.Error(err))
+                return nil, ErrStatusInternalServerError.Err()
+        }</span>
+
+        <span class="cov8" title="1">return &amp;emptypb.Empty{}, nil</span>
+}
+
+func (svc *todoListGRPC) UpdateTaskStatus(ctx context.Context, in *pbTodoList.UpdateTaskStatusRequest) (*emptypb.Empty, error) <span class="cov8" title="1">{
+        taskId, err := tools.GetValidUUID(in.GetId())
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">task, err := svc.taskRepository.GetTask(ctx, taskId)
+        if err != nil </span><span class="cov8" title="1">{
+                if err == repository.ErrTaskNotFound </span><span class="cov8" title="1">{
+                        return nil, ErrStatusTaskNotFound.Err()
+                }</span>
+                <span class="cov8" title="1">zap.S().Errorf("cannot get task", zap.Error(err))
+                return nil, ErrStatusInternalServerError.Err()</span>
+        }
+
+        <span class="cov8" title="1">task.Completed = in.GetCompleted()
+
+        if err := svc.taskRepository.UpdateTask(ctx, task); err != nil </span><span class="cov8" title="1">{
+                zap.S().Errorf("cannot update task", zap.Error(err))
+                return nil, ErrStatusInternalServerError.Err()
+        }</span>
+
+        <span class="cov8" title="1">if err := tools.SetStatusCode(ctx, http.StatusNoContent); err != nil </span><span class="cov0" title="0">{
+                zap.S().Errorf("cannot set new status_code", zap.Error(err))
+                return nil, ErrStatusInternalServerError.Err()
+        }</span>
+
+        <span class="cov8" title="1">return &amp;emptypb.Empty{}, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package repository
+
+import (
+        "context"
+        "database/sql"
+        "errors"
+        "time"
+
+        sq "github.com/Masterminds/squirrel"
+        uuid "github.com/satori/go.uuid"
+        "go.uber.org/zap"
+
+        "github.com/overridesh/sgg-todolist-service/internal/model"
+        storage "github.com/overridesh/sgg-todolist-service/pkg/storage/sql"
+)
+
+var (
+        ErrCommentNotFound = errors.New("comment not found")
+)
+
+type CommentRepository interface {
+        CreateComment(context.Context, model.Comment) (*model.Comment, error)
+        GetCommentsByTaskId(context.Context, uuid.UUID) ([]*model.Comment, error)
+        DeleteCommentByTaskIdAndCommentId(ctx context.Context, taskId uuid.UUID, commentId uuid.UUID) error
+}
+
+type commentRepository struct {
+        db storage.DB
+}
+
+func NewCommentRepository(db storage.DB) CommentRepository <span class="cov8" title="1">{
+        return &amp;commentRepository{
+                db: db,
+        }
+}</span>
+
+func (cr *commentRepository) CreateComment(ctx context.Context, newComment model.Comment) (*model.Comment, error) <span class="cov8" title="1">{
+        var (
+                err error
+                tx  *sql.Tx
+        )
+
+        tx, err = cr.db.BeginTx(ctx, nil)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">defer func() </span><span class="cov8" title="1">{
+                if err != nil </span><span class="cov0" title="0">{
+                        if err := tx.Rollback(); err != nil </span><span class="cov0" title="0">{
+                                zap.S().Errorf("cannot do a rollback, error: %v", err)
+                        }</span>
+                } else<span class="cov8" title="1"> {
+                        if err := tx.Commit(); err != nil </span><span class="cov8" title="1">{
+                                zap.S().Errorf("cannot do a commit, error: %v", err)
+                        }</span>
+                }
+        }()
+
+        <span class="cov8" title="1">query, args, err := psql.
+                Insert("comments").
+                Columns("task_id", "value").
+                Values(newComment.TaskId, newComment.Value).
+                Suffix("RETURNING \"id\", \"task_id\", \"value\", \"created_at\", \"deleted_at\"").
+                ToSql()
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">row := tx.QueryRowContext(
+                ctx,
+                query,
+                args...,
+        )
+        if err := row.Err(); err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">var comment model.Comment
+
+        if err := row.Scan(
+                &amp;comment.Id,
+                &amp;comment.TaskId,
+                &amp;comment.Value,
+                &amp;comment.CreatedAt,
+                &amp;comment.DeletedAt,
+        ); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">return &amp;comment, nil</span>
+}
+
+func (cr *commentRepository) GetCommentsByTaskId(ctx context.Context, taskId uuid.UUID) ([]*model.Comment, error) <span class="cov8" title="1">{
+        query, args, err := psql.
+                Select(`
+                        id,
+                        task_id,
+                        value,
+                        created_at,
+                        deleted_at
+                `).
+                From("comments").
+                Where(sq.Eq{
+                        "deleted_at": nil,
+                        "task_id":    taskId,
+                }).
+                ToSql()
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">rows, err := cr.db.QueryContext(ctx, query, args...)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">defer rows.Close()
+
+        var comments []*model.Comment = []*model.Comment{}
+
+        for rows.Next() </span><span class="cov8" title="1">{
+                var comment model.Comment
+
+                if err := rows.Scan(
+                        &amp;comment.Id,
+                        &amp;comment.TaskId,
+                        &amp;comment.Value,
+                        &amp;comment.CreatedAt,
+                        &amp;comment.DeletedAt,
+                ); err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov8" title="1">comments = append(comments, &amp;comment)</span>
+        }
+
+        <span class="cov8" title="1">return comments, nil</span>
+}
+
+func (cr *commentRepository) DeleteCommentByTaskIdAndCommentId(ctx context.Context, taskId uuid.UUID, commentId uuid.UUID) error <span class="cov8" title="1">{
+        query, args, err := psql.
+                Update("comments").
+                Set("deleted_at", time.Now()).
+                Where(sq.Eq{
+                        "deleted_at": nil,
+                        "task_id":    taskId,
+                        "id":         commentId,
+                }).ToSql()
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">result, err := cr.db.ExecContext(ctx, query, args...)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">affected, err := result.RowsAffected()
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">if affected == 0 </span><span class="cov8" title="1">{
+                return ErrCommentNotFound
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package repository
+
+import sq "github.com/Masterminds/squirrel"
+
+var (
+        limitPage uint64 = 20
+        limitOne  uint64 = 1
+)
+
+var (
+        // Squirrel for Postgres
+        psql sq.StatementBuilderType = sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+)
+
+// GetOffset get a offset from page and pagesize
+func GetOffset(page int32, pageSize uint64) uint64 <span class="cov8" title="1">{
+        var value int32 = page
+
+        if value &lt; 1 </span><span class="cov0" title="0">{
+                value = 1
+        }</span>
+        <span class="cov8" title="1">return uint64((value - 1)) * pageSize</span>
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package repository
+
+import (
+        "context"
+        "database/sql"
+        "errors"
+        "time"
+
+        sq "github.com/Masterminds/squirrel"
+        uuid "github.com/satori/go.uuid"
+        "go.uber.org/zap"
+
+        "github.com/overridesh/sgg-todolist-service/internal/model"
+        storage "github.com/overridesh/sgg-todolist-service/pkg/storage/sql"
+)
+
+var (
+        ErrLabelNotFound      = errors.New("label not found")
+        ErrLabelAlreadyExists = errors.New("label already exists")
+)
+
+type LabelRepository interface {
+        CreateLabel(context.Context, model.Label) (*model.Label, error)
+        GetLabelsByTaskId(context.Context, uuid.UUID) ([]*model.Label, error)
+        DeleteLabelByTaskIdAndLabelId(ctx context.Context, taskId uuid.UUID, labelId uuid.UUID) error
+}
+
+type labelRepository struct {
+        db storage.DB
+}
+
+func NewLabelRepository(db storage.DB) LabelRepository <span class="cov8" title="1">{
+        return &amp;labelRepository{
+                db: db,
+        }
+}</span>
+
+func (cr *labelRepository) CreateLabel(ctx context.Context, newLabel model.Label) (*model.Label, error) <span class="cov8" title="1">{
+        var (
+                err error
+                tx  *sql.Tx
+        )
+
+        tx, err = cr.db.BeginTx(ctx, nil)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">defer func() </span><span class="cov8" title="1">{
+                if err != nil </span><span class="cov0" title="0">{
+                        if err := tx.Rollback(); err != nil </span><span class="cov0" title="0">{
+                                zap.S().Errorf("cannot do a rollback, error: %v", err)
+                        }</span>
+                } else<span class="cov8" title="1"> {
+                        if err := tx.Commit(); err != nil </span><span class="cov8" title="1">{
+                                zap.S().Errorf("cannot do a commit, error: %v", err)
+                        }</span>
+                }
+        }()
+
+        <span class="cov8" title="1">query, args, err := psql.Select("COUNT(id)").
+                From("labels").
+                Where(sq.Eq{
+                        "deleted_at": nil,
+                        "task_id":    newLabel.TaskId,
+                        "value":      newLabel.Value,
+                }).ToSql()
+
+        row := tx.QueryRowContext(
+                ctx,
+                query,
+                args...,
+        )
+        if err := row.Err(); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">var count int64
+        if err := row.Scan(
+                &amp;count,
+        ); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">if count &gt; 0 </span><span class="cov8" title="1">{
+                return nil, ErrLabelAlreadyExists
+        }</span>
+
+        <span class="cov8" title="1">query, args, err = psql.
+                Insert("labels").
+                Columns("task_id", "value").
+                Values(newLabel.TaskId, newLabel.Value).
+                Suffix("RETURNING \"id\", \"task_id\", \"value\", \"created_at\", \"deleted_at\"").
+                ToSql()
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">row = tx.QueryRowContext(
+                ctx,
+                query,
+                args...,
+        )
+        if err := row.Err(); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">var label model.Label
+        if err := row.Scan(
+                &amp;label.Id,
+                &amp;label.TaskId,
+                &amp;label.Value,
+                &amp;label.CreatedAt,
+                &amp;label.DeletedAt,
+        ); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">return &amp;label, nil</span>
+}
+
+func (cr *labelRepository) GetLabelsByTaskId(ctx context.Context, taskId uuid.UUID) ([]*model.Label, error) <span class="cov8" title="1">{
+        query, args, err := psql.
+                Select(`
+                        id,
+                        task_id,
+                        value,
+                        created_at,
+                        deleted_at
+                `).
+                From("labels").
+                Where(sq.Eq{
+                        "deleted_at": nil,
+                        "task_id":    taskId,
+                }).
+                ToSql()
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">rows, err := cr.db.QueryContext(ctx, query, args...)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">defer rows.Close()
+
+        var labels []*model.Label = []*model.Label{}
+
+        for rows.Next() </span><span class="cov8" title="1">{
+                var label model.Label
+
+                if err := rows.Scan(
+                        &amp;label.Id,
+                        &amp;label.TaskId,
+                        &amp;label.Value,
+                        &amp;label.CreatedAt,
+                        &amp;label.DeletedAt,
+                ); err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov8" title="1">labels = append(labels, &amp;label)</span>
+        }
+
+        <span class="cov8" title="1">return labels, nil</span>
+}
+
+func (cr *labelRepository) DeleteLabelByTaskIdAndLabelId(ctx context.Context, taskId uuid.UUID, labelId uuid.UUID) error <span class="cov8" title="1">{
+        query, args, err := psql.
+                Update("labels").
+                Set("deleted_at", time.Now()).
+                Where(sq.Eq{
+                        "deleted_at": nil,
+                        "task_id":    taskId,
+                        "id":         labelId,
+                }).ToSql()
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">result, err := cr.db.ExecContext(ctx, query, args...)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">affected, err := result.RowsAffected()
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">if affected == 0 </span><span class="cov8" title="1">{
+                return ErrLabelNotFound
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package repository
+
+import (
+        "context"
+        "database/sql"
+        "errors"
+        "time"
+
+        sq "github.com/Masterminds/squirrel"
+        uuid "github.com/satori/go.uuid"
+        "go.uber.org/zap"
+
+        "github.com/overridesh/sgg-todolist-service/internal/model"
+        storage "github.com/overridesh/sgg-todolist-service/pkg/storage/sql"
+)
+
+var (
+        ErrTaskNotFound = errors.New("task not found")
+)
+
+type TaskRepository interface {
+        GetTask(context.Context, uuid.UUID) (*model.Task, error)
+        GetTasks(context.Context, int32) ([]*model.Task, error)
+        CreateTask(context.Context, model.Task) (*model.Task, error)
+        UpdateTask(context.Context, *model.Task) error
+        DeleteTask(context.Context, uuid.UUID) error
+}
+
+type taskRepository struct {
+        db storage.DB
+}
+
+func NewTaskRepository(db storage.DB) TaskRepository <span class="cov8" title="1">{
+        return &amp;taskRepository{
+                db: db,
+        }
+}</span>
+
+func (tk *taskRepository) GetTask(ctx context.Context, id uuid.UUID) (*model.Task, error) <span class="cov8" title="1">{
+        query, args, err := psql.
+                Select(`
+                        id,
+                        value,
+                        completed,
+                        due_date,
+                        created_at,
+                        updated_at,
+                        deleted_at
+                `).
+                From("tasks").
+                Where(sq.Eq{
+                        "deleted_at": nil,
+                        "id":         id,
+                }).
+                Limit(limitOne).
+                ToSql()
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">var task model.Task
+
+        if err := tk.db.QueryRowContext(ctx, query, args...).Scan(
+                &amp;task.Id,
+                &amp;task.Value,
+                &amp;task.Completed,
+                &amp;task.DueDate,
+                &amp;task.CreatedAt,
+                &amp;task.UpdatedAt,
+                &amp;task.DeletedAt,
+        ); err != nil </span><span class="cov8" title="1">{
+                if errors.Is(err, sql.ErrNoRows) </span><span class="cov8" title="1">{
+                        return nil, ErrTaskNotFound
+                }</span>
+                <span class="cov0" title="0">return nil, err</span>
+        }
+
+        <span class="cov8" title="1">return &amp;task, nil</span>
+}
+
+func (tk *taskRepository) GetTasks(ctx context.Context, page int32) ([]*model.Task, error) <span class="cov8" title="1">{
+        query, args, err := psql.
+                Select(`
+                        id,
+                        value,
+                        completed,
+                        due_date,
+                        created_at,
+                        updated_at,
+                        deleted_at
+                `).
+                From("tasks").
+                Where(sq.Eq{
+                        "deleted_at": nil,
+                }).
+                Limit(limitPage).
+                Offset(GetOffset(page, limitPage)).
+                ToSql()
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">rows, err := tk.db.QueryContext(ctx, query, args...)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">defer rows.Close()
+
+        var tasks []*model.Task = []*model.Task{}
+
+        for rows.Next() </span><span class="cov8" title="1">{
+                var task model.Task
+
+                if err := rows.Scan(
+                        &amp;task.Id,
+                        &amp;task.Value,
+                        &amp;task.Completed,
+                        &amp;task.DueDate,
+                        &amp;task.CreatedAt,
+                        &amp;task.UpdatedAt,
+                        &amp;task.DeletedAt,
+                ); err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov8" title="1">tasks = append(tasks, &amp;task)</span>
+        }
+
+        <span class="cov8" title="1">return tasks, nil</span>
+}
+
+func (tk *taskRepository) CreateTask(ctx context.Context, newTask model.Task) (*model.Task, error) <span class="cov8" title="1">{
+        var (
+                err error
+                tx  *sql.Tx
+        )
+
+        tx, err = tk.db.BeginTx(ctx, nil)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">defer func() </span><span class="cov8" title="1">{
+                if err != nil </span><span class="cov0" title="0">{
+                        if err := tx.Rollback(); err != nil </span><span class="cov0" title="0">{
+                                zap.S().Errorf("cannot do a rollback, error: %v", err)
+                        }</span>
+                } else<span class="cov8" title="1"> {
+                        if err := tx.Commit(); err != nil </span><span class="cov0" title="0">{
+                                zap.S().Errorf("cannot do a commit, error: %v", err)
+                        }</span>
+                }
+        }()
+
+        <span class="cov8" title="1">query, args, err := psql.
+                Insert("tasks").
+                Columns("value", "due_date").
+                Values(newTask.Value, newTask.DueDate).
+                Suffix("RETURNING \"id\", \"value\", \"completed\", \"due_date\", \"created_at\", \"updated_at\", \"deleted_at\"").
+                ToSql()
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">row := tx.QueryRowContext(
+                ctx,
+                query,
+                args...,
+        )
+        if err := row.Err(); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">var task model.Task
+        if err := row.Scan(
+                &amp;task.Id,
+                &amp;task.Value,
+                &amp;task.Completed,
+                &amp;task.DueDate,
+                &amp;task.CreatedAt,
+                &amp;task.UpdatedAt,
+                &amp;task.DeletedAt,
+        ); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">return &amp;task, nil</span>
+}
+
+func (tk *taskRepository) UpdateTask(ctx context.Context, task *model.Task) error <span class="cov8" title="1">{
+        query, args, err := psql.
+                Update("tasks").
+                Set("value", task.Value).
+                Set("completed", task.Completed).
+                Set("due_date", task.DueDate).
+                Set("updated_at", time.Now()).
+                Where(sq.Eq{
+                        "deleted_at": nil,
+                        "id":         task.Id,
+                }).
+                ToSql()
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">if err := tk.db.QueryRowContext(ctx, query, args...).Err(); err != nil </span><span class="cov8" title="1">{
+                if errors.Is(err, sql.ErrNoRows) </span><span class="cov8" title="1">{
+                        return ErrTaskNotFound
+                }</span>
+                <span class="cov8" title="1">return err</span>
+        }
+
+        <span class="cov8" title="1">return nil</span>
+}
+
+func (tk *taskRepository) DeleteTask(ctx context.Context, id uuid.UUID) error <span class="cov8" title="1">{
+        query, args, err := psql.
+                Update("tasks").
+                Set("deleted_at", time.Now()).
+                Where(sq.Eq{
+                        "deleted_at": nil,
+                        "id":         id,
+                }).ToSql()
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">result, err := tk.db.ExecContext(ctx, query, args...)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">affected, err := result.RowsAffected()
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">if affected == 0 </span><span class="cov8" title="1">{
+                return ErrTaskNotFound
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package tools
+
+import "github.com/kelseyhightower/envconfig"
+
+/*
+  GetConfig sets the configuration depending on the environment or
+  in the future we can load from the vault or injections with another strategy in the same func
+*/
+
+func GetConfig(prefix string, cfg interface{}) error <span class="cov8" title="1">{
+        return envconfig.Process(prefix, cfg)
+}</span>
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package tools
+
+import (
+        "context"
+        "strconv"
+
+        "google.golang.org/grpc"
+        "google.golang.org/grpc/metadata"
+)
+
+func SetStatusCode(ctx context.Context, statusCode int) error <span class="cov8" title="1">{
+        return grpc.SetHeader(ctx, metadata.Pairs("X-http-code", strconv.Itoa(statusCode)))
+}</span>
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package tools
+
+import (
+        "time"
+)
+
+const TimeLayout string = "2006-01-02T15:04:05.000Z"
+
+func FormatDate(t time.Time) string <span class="cov8" title="1">{
+        return t.Format(TimeLayout)
+}</span>
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package tools
+
+import (
+        uuid "github.com/satori/go.uuid"
+        "google.golang.org/grpc/codes"
+        "google.golang.org/grpc/status"
+)
+
+var (
+        ErrStatusIdMustBeUUID     *status.Status = status.New(codes.InvalidArgument, "the id must be uuid")
+        ErrStatusIdMusBeValidUUID *status.Status = status.New(codes.InvalidArgument, "the id must be a valid uuid")
+)
+
+func GetValidUUID(id string) (uuid.UUID, error) <span class="cov8" title="1">{
+        validUUID, err := uuid.FromString(id)
+        if err != nil </span><span class="cov8" title="1">{
+                return uuid.Nil, ErrStatusIdMustBeUUID.Err()
+        }</span>
+
+        <span class="cov8" title="1">if validUUID == uuid.Nil </span><span class="cov8" title="1">{
+                return uuid.Nil, ErrStatusIdMusBeValidUUID.Err()
+        }</span>
+
+        <span class="cov8" title="1">return validUUID, nil</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

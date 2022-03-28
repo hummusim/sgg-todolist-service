@@ -1,0 +1,20 @@
+name: cmd/gateway 
+
+on:
+  push:
+    branches: [ main, master, develop, dev ]
+  pull_request:
+    branches: [ main, master, develop, dev ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16
+
+    - name: run build gateway
+      run: cd todolist/cmd/http && go build . 

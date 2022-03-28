@@ -1,0 +1,27 @@
+# Start from golang base image
+FROM golang:1.16-alpine3.13
+
+# Add Maintainer info
+LABEL maintainer="overridesh"
+
+# Update Alpine
+RUN apk update
+
+# Install utils packages.
+RUN apk add --no-cache git
+
+# Set the current working directory inside the container
+WORKDIR /go/src/github.com/overridesh/sgg-todolist-service
+
+# Copy go mod and sum files
+COPY go.mod .
+COPY go.sum .
+
+# Download all dependencies. Dependencies will be cached if the go.mod and the go.sum files are not changed
+RUN go mod download
+
+RUN go get github.com/canthefason/go-watcher/cmd/watcher
+
+WORKDIR /go/src/github.com/overridesh/sgg-todolist-service/cmd/http
+
+ENTRYPOINT ["watcher", "-watch", "github.com/overridesh/sgg-todolist-service"] 
