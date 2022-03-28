@@ -2,6 +2,7 @@
 
 ### Project layout
 
+```
 ├── Dockerfile.grpc
 ├── Dockerfile.grpc.dev
 ├── Dockerfile.http
@@ -29,7 +30,6 @@
 ├── pkg
 │   ├── mock
 │   └── storage
-
 ├── proto
 ├── scripts
 │   └── db
@@ -37,9 +37,14 @@
 │       └── migrations
 ├── third_party
 ├── tools
-
+```
 ### Database 
 ---
 <p align="center" width="100%">
+<<<<<<< HEAD
     <img width="50%" src="database.png?raw=true"> 
 </p>
+=======
+    <img width="50%" src="service.png?raw=true"> 
+</p>
+>>>>>>> 707f04111bfb1acb1cc512479be1952469d4b0be
